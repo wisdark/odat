@@ -28,7 +28,7 @@ class ExternalTable (DirectoryManagement):
 		CREATE TABLE rf1 (id NUMBER PRIMARY KEY, path VARCHAR(255) UNIQUE, ot_format VARCHAR(6));
 		'''
 		logging.info('Create the table: {0}'.format(self.tableName))
-		query = "CREATE TABLE {0} (line varchar2(256)) ORGANIZATION EXTERNAL (TYPE oracle_loader DEFAULT DIRECTORY {1} ACCESS PARAMETERS ( RECORDS DELIMITED BY NEWLINE BADFILE 'bad_data.bad' LOGFILE 'log_data.log' FIELDS TERMINATED BY ',' MISSING FIELD VALUES ARE NULL REJECT ROWS WITH ALL NULL FIELDS (line)) LOCATION ('{2}')) PARALLEL REJECT LIMIT 0 NOMONITORING".format(self.tableName, self.directoryName, remoteNameFile)
+		query = "CREATE TABLE {0} (line varchar2(256)) ORGANIZATION EXTERNAL (TYPE oracle_loader DEFAULT DIRECTORY {1} ACCESS PARAMETERS ( RECORDS DELIMITED BY NEWLINE BADFILE 'bad_data.bad' NOLOGFILE FIELDS TERMINATED BY ',' MISSING FIELD VALUES ARE NULL REJECT ROWS WITH ALL NULL FIELDS (line)) LOCATION ('{2}')) PARALLEL REJECT LIMIT 0 NOMONITORING".format(self.tableName, self.directoryName, remoteNameFile)
 		response = self.__execThisQuery__(query=query,isquery=False)
 		if isinstance(response,Exception) :
 			logging.info('Error with the SQL request {0}: {1}'.format(query,str(response)))
@@ -114,15 +114,15 @@ class ExternalTable (DirectoryManagement):
 		folder = self.__generateRandomString__()	
 		self.args['print'].subtitle("External table to read files ?")
 		logging.info("Simulate the file reading in the {0} folder thanks to an external table".format(folder))
-		status = self.getFile (remotePath=folder, remoteNameFile='data.txt', localFile="test.txt")
-		if (status == True or self.ERROR_EXTERNAL_TABLE_WITH_WRITE in str(status) or self.ERROR_EXTERNAL_TABLE_READ in str(status)) and (self.ERROR_ODCIEXTTABLEOPEN not in str(status)):
+		status = self.getFile(remotePath=folder, remoteNameFile='data.txt', localFile="test.txt")
+		if (status == True or self.ERROR_EXTERNAL_TABLE_WITH_WRITE in str(status) or self.ERROR_EXTERNAL_TABLE_READ in str(status)):
 			self.args['print'].goodNews("OK")
 		else : 
 			self.args['print'].badNews("KO")
 		self.args['print'].subtitle("External table to execute system commands ?")
 		logging.info("Simulate the file execution thanks to an external table")
 		status = self.execute (remotePath=folder, remoteNameFile='test')
-		if (status == True or self.ERROR_EXTERNAL_TABLE_WITH_WRITE in str(status) or self.ERROR_EXTERNAL_TABLE_READ in str(status)) and (self.ERROR_ODCIEXTTABLEOPEN not in str(status)):
+		if (status == True or self.ERROR_EXTERNAL_TABLE_WITH_WRITE in str(status) or self.ERROR_EXTERNAL_TABLE_READ in str(status)):
 			self.args['print'].goodNews("OK")
 		else : 
 			self.args['print'].badNews("KO")

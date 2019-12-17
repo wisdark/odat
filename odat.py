@@ -27,7 +27,6 @@ from DbmsScheduler import DbmsScheduler,runDbmsSchedulerModule
 from UtlHttp import UtlHttp,runUtlHttpModule
 from HttpUriType import HttpUriType,runHttpUriTypeModule
 from Java import Java,runjavaModule
-from Info import Info
 from PasswordGuesser import PasswordGuesser, runPasswordGuesserModule
 from SIDGuesser import SIDGuesser, runSIDGuesserModule
 from SMB import SMB, runSMBModule
@@ -45,6 +44,7 @@ from Unwrapper import runUnwrapperModule
 from PrivilegeEscalation import PrivilegeEscalation, runPrivilegeEscalationModule
 from CVE_XXXX_YYYY import CVE_XXXX_YYYY, runCVEXXXYYYModule
 from Tnspoison import Tnspoison, runTnsPoisonModule
+from OracleDatabase import OracleDatabase
 
 class MyFormatter(argparse.RawTextHelpFormatter):
     """
@@ -152,13 +152,10 @@ def runAllModules(args):
 			args['sid'] , args['user'], args['password'] = aSid, loginAndPass[0],loginAndPass[1]
 			args['print'].title("Testing all modules on the {0} SID with the {1}/{2} account".format(args['sid'],args['user'],args['password']))
 			#INFO ABOUT REMOTE SERVER
-			info = Info(args)
-			status = info.connection()
+			status = OracleDatabase(args).connection()
 			if isinstance(status,Exception):
 				args['print'].badNews("Impossible to connect to the remote database: {0}".format(str(status).replace('\n','')))
 				break
-			info.loadInformationRemoteDatabase()
-			args['info'] = info
 			#UTL_HTTP
 			utlHttp = UtlHttp(args)
 			status = utlHttp.connection()
@@ -338,6 +335,7 @@ def main():
 	PPjava._optionals.title = "java commands"
 	PPjava.add_argument('--exec',dest='exec',default=None,required=False,help='execute a system command on the remote system')
 	PPjava.add_argument('--shell',dest='shell',action='store_true',required=False,help='get a shell on the remote system')
+	PPjava.add_argument('--path-shell',dest='path-shell',default="/bin/sh",required=False,help='specify path to shell (default: %(default)s)')
 	PPjava.add_argument('--reverse-shell',dest='reverse-shell',required=False,nargs=2,metavar=('ip','port'),help='get a reverse shell')
 	PPjava.add_argument('--create-file-CVE-2018-3004',dest='create-file-CVE-2018-3004',required=False,nargs=2,metavar=('data','filename'),help='create (or append to) a file with CVE-2018-3004 (Bypass built in Oracle JVM security)')
 	PPjava.add_argument('--test-module',dest='test-module',action='store_true',help='test the module before use it')	
@@ -435,7 +433,8 @@ def main():
 	PPcve = argparse.ArgumentParser(add_help=False,formatter_class=myFormatterClass)
 	PPcve._optionals.title = "cve commands"
 	PPcve.add_argument('--test-module',dest='test-module',action='store_true',help='test the module before use it')
-	PPcve.add_argument('--set-pwd-2014-4237',dest='set-pwd-2014-4237',nargs=2,metavar=('username','password'),help="modify a Oracle user's password unsing CVE-2014-4237")
+	PPcve.add_argument('--set-pwd-2014-4237',dest='set-pwd-2014-4237',nargs=2,metavar=('username','password'),help="modify a Oracle user's password using CVE-2014-4237")
+	PPcve.add_argument('--cve-2018-3004',dest='cve-2018-3004',nargs=2,metavar=('path','dataInFile'),help="create/modify a text file on the target using CVE-2018-3004")
 	#1.21- Parent parser: search
 	PPsearch = argparse.ArgumentParser(add_help=False,formatter_class=myFormatterClass)
 	PPsearch._optionals.title = "search commands"

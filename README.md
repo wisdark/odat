@@ -14,13 +14,20 @@ Usage examples of ODAT:
 * You have a valid Oracle account on a database and want to __escalate your privileges__ to become DBA or SYSDBA
 * You have a Oracle account and you want to __execute system commands__ (e.g. __reverse shell__) in order to move forward on the operating system hosting the database
 
-Tested on Oracle Database __10g__,  __11g__ and __12c__.
+Tested on Oracle Database __10g__,  __11g__,  __12c__ and __18c__.
 
-__ODAT linux standalone__ version at [https://github.com/quentinhardy/odat/releases/](https://github.com/quentinhardy/odat/releases/). Notice it is recommended to use the development version (*git clone*).
-~~(__Deprecated at this time__)~~
+Compatible with both python 2.7 ([master branch](https://github.com/quentinhardy/odat/tree/master)) and __python 3__ ([master-python3 branch](https://github.com/quentinhardy/odat/tree/master-python3)).
+
+__ODAT linux standalone__ version at [https://github.com/quentinhardy/odat/releases/](https://github.com/quentinhardy/odat/releases/). Notice it is recommended to use the development version (*git clone*), with the [master-python3 branch](https://github.com/quentinhardy/odat/tree/master-python3).
 
 Changelog
 ====
+* Version __3.0__ (__01/09/2019__):
+  * Compatible with Oracle Database 18c
+  * New option in Java module for setting the path to shell (e.g. /usr/bin/sh when CentOS)
+* Version __2.3.2__ (__16/07/2019__):
+  * Bug fixes:
+    * external table and false negative
 * Version __2.3.1__ (__10/08/2018__):
   * New option in Java module for exploiting CVE-2018-3004: It allows an authenticated user to arbitrarily write to files on the OS (Privilege escalation with bypass built in Oracle JVM security). More details [http://obtruse.syfrtext.com/2018/07/oracle-privilege-escalation-via.html](http://obtruse.syfrtext.com/2018/07/oracle-privilege-escalation-via.html). 
 * Version __2.3__ (__06/03/2018__):
@@ -153,7 +160,7 @@ __Standalone versions__ exist in order to don't have need to install dependencie
 The ODAT standalone has been generated thanks to *pyinstaller*.
 
 If you want to have the __development version__ installed on your computer, these following tools and dependencies are needed:
-* Langage: Python 2.7
+* Langage: Python 2.7 & Python 3
 * Oracle dependancies: 
   * Instant Oracle basic
   * Instant Oracle sdk
@@ -194,43 +201,30 @@ git submodule update
 sudo apt-get install libaio1 python-dev alien python-pip
 ```
 
-* Generate DEB files from RPM files thanks to :
+* Generate DEB files from RPM files with :
 ```bash
-sudo alien --to-deb oracle-instantclient11.2-basic-???.x???.rpm
-sudo alien --to-deb oracle-instantclient11.2-sqlplus-???.x???.rpm
-sudo alien --to-deb oracle-instantclient11.2-devel-???.x???.rpm
+sudo alien --to-deb oracle-instantclient19.3-basic-???.x???.rpm
+sudo alien --to-deb oracle-instantclient19.3-devel-???.x???.rpm
 ```
 
 * Install instant client basic, sdk and sqlplus:
 ```bash
-sudo dpkg -i oracle-instantclient11.2-basic-???.x???.deb
-sudo dpkg -i oracle-instantclient11.2-sqlplus-???.x???.deb
-sudo dpkg -i oracle-instantclient11.2-devel_???_???.deb
+sudo dpkg -i oracle-instantclient19.3-basic-???.x???.deb
+sudo dpkg -i oracle-instantclient19.3-devel_???_???.deb
 ```
 
 * Put these lines in your */etc/profile* file in order to define Oracle *env* variables:
 ```bash
-export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
+export ORACLE_HOME=/usr/lib/oracle/19.3/client64/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME/lib
 export PATH=$ORACLE_HOME/bin:$PATH
 ```
 
-* Restart your session (to apply env variables)  and run *sqlplus*:
-```bash
-sqlplus
-```
-
-> If nor error: good job, Continue...
-
-* Create a symlink to your so file.
-```bash
-cd $ORACLE_HOME/lib/
-sudo ln -s libclntsh.so.11.1   libclntsh.so
-```
+* Restart your session (to apply env variables)
 
 * Create the */etc/ld.so.conf.d/oracle.conf* file and add the path to Oracle home:
 ```
-/usr/lib/oracle/11.2/client64/lib/
+/usr/lib/oracle/19.3/client64/lib/
 ```
 
 * Update the ldpath using:

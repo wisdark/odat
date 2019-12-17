@@ -105,6 +105,8 @@ CREATE OR REPLACE AND COMPILE JAVA SOURCE NAMED "OSCommand" AS
 		CREATE AND COMPILE JAVA CLASS and CREATE FUNCTION TO CALL JAVA
 		'''
 		logging.info("Create and compile the java class")
+		if "path-shell" in self.args:
+			self.SOURCE_OS_COMMAND_CLASS = self.SOURCE_OS_COMMAND_CLASS.replace('"/bin/sh"','"'+self.args["path-shell"]+'"')
 		status = self.__execPLSQL__(self.SOURCE_OS_COMMAND_CLASS)
 		if isinstance(status,Exception):
 			logging.info("Impossible to create and compile the java class: {0}".format(self.cleanError(status)))
@@ -123,7 +125,7 @@ CREATE OR REPLACE AND COMPILE JAVA SOURCE NAMED "OSCommand" AS
 		Delete the COMPILED JAVA CLASS and delete the CREATED FUNCTION
 		'''
 		logging.info("Delete the PL/SQL function created")
-		status = self.__execPLSQL__(self.SOURCE_DROP_FUNCTION)	
+		status = self.__execPLSQL__(self.SOURCE_DROP_FUNCTION)
 		if isinstance(status,Exception):
 			logging.info("Impossible to drop the function: {0}".format(self.cleanError(status)))
 			return status
